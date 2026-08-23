@@ -20,6 +20,11 @@
         "backgroundColor": "#0B0F19",
         "foregroundImage": "./assets/icon.png"
       },
+      "splash": {
+        "image": "./assets/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#0B0F19"
+      },
       "package": "com.plaxoragroup.sleeptracker"
     },
     "web": {
