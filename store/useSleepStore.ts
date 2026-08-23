@@ -64,10 +64,12 @@ export const useSleepStore = create<SleepState>((set, get) => ({
   activeTab: 'sounds',
 
   init: async () => {
+    // Ensure all audio engine tracks are stopped on app launch
+    await audioEngine.stopAllTracks();
+
     const loadedSessions = await loadSleepSessions();
     const loadedPresets = await loadSleepPresets();
 
-    // Default sample session if empty
     let sampleSessions = loadedSessions;
     if (sampleSessions.length === 0) {
       const now = new Date();
@@ -87,6 +89,7 @@ export const useSleepStore = create<SleepState>((set, get) => ({
     }
 
     set({
+      sounds: INITIAL_AMBIENT_SOUNDS.map((s) => ({ ...s, isPlaying: false })),
       sessions: sampleSessions,
       presets: loadedPresets,
     });
@@ -180,7 +183,7 @@ export const useSleepStore = create<SleepState>((set, get) => ({
     const { activeBedtimeISO, sessions } = get();
     const nowISO = new Date().toISOString();
 
-    let durationMinutes = 480; // default 8 hours
+    let durationMinutes = 480;
     let score = 85;
 
     if (activeBedtimeISO) {
@@ -189,7 +192,6 @@ export const useSleepStore = create<SleepState>((set, get) => ({
       const diffMs = Math.max(0, wake - bed);
       durationMinutes = Math.round(diffMs / (1000 * 60));
 
-      // Calculate score based on 7-9 hours ideal range
       const hours = durationMinutes / 60;
       if (hours >= 7 && hours <= 9) {
         score = Math.min(98, Math.round(85 + (hours - 7) * 5));

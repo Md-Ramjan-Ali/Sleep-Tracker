@@ -9,6 +9,7 @@ import { SleepTimerModal } from './components/SleepTimerModal';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { StartSleepModal } from './components/StartSleepModal';
 import { ActiveTrackingScreen } from './components/ActiveTrackingScreen';
+import { CustomSplashScreen } from './components/CustomSplashScreen';
 import { BottomTabBar } from './components/BottomTabBar';
 import { useSleepStore } from './store/useSleepStore';
 
@@ -16,6 +17,7 @@ export default function App() {
   const init = useSleepStore((state) => state.init);
   const startNightSession = useSleepStore((state) => state.startNightSession);
 
+  const [showSplash, setShowSplash] = useState(true);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [showTimerModal, setShowTimerModal] = useState(false);
@@ -37,6 +39,11 @@ export default function App() {
     startNightSession();
     setShowActiveTracking(true);
   };
+
+  // Custom App Opening Splash Screen with Glowing Logo & Plaxora Group title
+  if (showSplash) {
+    return <CustomSplashScreen onFinish={() => setShowSplash(false)} />;
+  }
 
   if (!hasCompletedOnboarding) {
     return <OnboardingScreen onComplete={() => setHasCompletedOnboarding(true)} />;

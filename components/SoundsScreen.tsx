@@ -14,38 +14,43 @@ import {
   Waves,
   Gem,
   Volume2,
+  Square,
+  VolumeX,
 } from 'lucide-react-native';
 import { useSleepStore } from '../store/useSleepStore';
 
 export const SoundsScreen: React.FC = () => {
   const sounds = useSleepStore((state) => state.sounds);
   const toggleSound = useSleepStore((state) => state.toggleSound);
+  const stopAllSounds = useSleepStore((state) => state.stopAllSounds);
+
+  const playingSounds = sounds.filter((s) => s.isPlaying);
 
   const whiteNoiseCards = [
     {
       id: 'rain_tent',
-      soundId: 'rain_heavy',
+      soundId: 'rain_tent',
       title: 'Rain on Tent',
       sub: 'Nature',
       icon: Tent,
     },
     {
       id: 'brainwaves',
-      soundId: 'thunder_soft',
+      soundId: 'brainwaves',
       title: 'Brainwaves',
       sub: 'Colored Noises',
       icon: Activity,
     },
     {
       id: 'room_noise',
-      soundId: 'cozy_fire',
+      soundId: 'room_noise',
       title: 'Room Noise',
       sub: 'Colored Noises',
       icon: Bed,
     },
     {
       id: 'pink_noise',
-      soundId: 'white_noise',
+      soundId: 'pink_noise',
       title: 'Pink Noise',
       sub: 'Colored Noises',
       icon: Waves,
@@ -55,7 +60,7 @@ export const SoundsScreen: React.FC = () => {
   const musicCards = [
     {
       id: 'stream',
-      soundId: 'ocean_waves',
+      soundId: 'water_stream',
       title: 'Water Stream in...',
       sub: 'Nature',
       duration: '5 min',
@@ -63,7 +68,7 @@ export const SoundsScreen: React.FC = () => {
     },
     {
       id: 'strength',
-      soundId: 'forest_wind',
+      soundId: 'inner_strength',
       title: 'Your Inner Streng...',
       sub: 'Healing',
       duration: '4 min',
@@ -71,7 +76,7 @@ export const SoundsScreen: React.FC = () => {
     },
     {
       id: 'galaxy',
-      soundId: 'night_crickets',
+      soundId: 'beyond_galaxy',
       title: 'Beyond Galaxy',
       sub: 'Special',
       duration: '7 min',
@@ -82,7 +87,7 @@ export const SoundsScreen: React.FC = () => {
   const meditationCards = [
     {
       id: 'ease_mind',
-      soundId: 'meditation_bell',
+      soundId: 'ease_mind',
       title: 'Ease the Mind',
       sub: 'Meditation',
       duration: '5 min',
@@ -90,7 +95,7 @@ export const SoundsScreen: React.FC = () => {
     },
     {
       id: 'deep_slumber',
-      soundId: 'night_crickets',
+      soundId: 'deep_slumber',
       title: 'Deep Slumber',
       sub: 'Sleep',
       duration: '6 min',
@@ -98,7 +103,7 @@ export const SoundsScreen: React.FC = () => {
     },
     {
       id: 'calm_waves',
-      soundId: 'ocean_waves',
+      soundId: 'calm_waves',
       title: 'Calm Your Waves',
       sub: 'Relax',
       duration: '4 min',
@@ -108,10 +113,38 @@ export const SoundsScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Top Header (NO PRO Badge) */}
+      {/* Top Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Sounds</Text>
+
+        {playingSounds.length > 0 ? (
+          <TouchableOpacity
+            style={styles.stopAllHeaderBtn}
+            onPress={stopAllSounds}
+            activeOpacity={0.8}
+          >
+            <VolumeX size={16} color="#EF4444" />
+            <Text style={styles.stopAllHeaderText}>Mute All</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
+
+      {/* Active Sound Playing Bar */}
+      {playingSounds.length > 0 ? (
+        <View style={styles.activePlayingBar}>
+          <Volume2 size={20} color="#38BDF8" />
+          <View style={styles.activePlayingTextCol}>
+            <Text style={styles.activePlayingTitle} numberOfLines={1}>
+              {playingSounds.map((s) => s.name).join(', ')}
+            </Text>
+            <Text style={styles.activePlayingSub}>Playing Now</Text>
+          </View>
+
+          <TouchableOpacity style={styles.stopIconBtn} onPress={stopAllSounds} activeOpacity={0.8}>
+            <Square size={14} color="#FFFFFF" fill="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+      ) : null}
 
       {/* Section 1: White Noise */}
       <View style={styles.sectionHeaderRow}>
@@ -135,7 +168,7 @@ export const SoundsScreen: React.FC = () => {
               activeOpacity={0.8}
             >
               <View style={styles.noiseIconBox}>
-                <Icon size={24} color="#94A3B8" />
+                <Icon size={24} color={isPlaying ? '#3B82F6' : '#94A3B8'} />
                 <View style={styles.diamondBadge}>
                   <Gem size={10} color="#FFFFFF" fill="#00D2FF" />
                 </View>
@@ -271,13 +304,62 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '800',
     color: '#FFFFFF',
     letterSpacing: 0.4,
+  },
+  stopAllHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#1E1B4B',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#3730A3',
+  },
+  stopAllHeaderText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#EF4444',
+  },
+  activePlayingBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1E293B',
+    padding: 12,
+    borderRadius: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#334155',
+    gap: 12,
+  },
+  activePlayingTextCol: {
+    flex: 1,
+  },
+  activePlayingTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  activePlayingSub: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#38BDF8',
+    marginTop: 1,
+  },
+  stopIconBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sectionHeaderRow: {
     flexDirection: 'row',
